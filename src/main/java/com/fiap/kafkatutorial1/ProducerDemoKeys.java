@@ -6,12 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
-public class ProducerDemo {
+public class ProducerDemoKeys {
 
-    public static void main(String[] args) {
-        Logger logger = LoggerFactory.getLogger(ProducerDemo.class);
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
+        Logger logger = LoggerFactory.getLogger(ProducerDemoKeys.class);
         String bootstrapServers = "127.0.0.1:9092";
+        String topic = "kafka-course";
+        String value = "hello kafka";
+        String key = UUID.randomUUID().toString();
 
         //Create producer properties
         Properties properties = new Properties();
@@ -24,7 +29,7 @@ public class ProducerDemo {
         KafkaProducer<String,String> producer = new KafkaProducer<String, String>(properties);
 
         //Create Producer Record
-        ProducerRecord<String,String> record = new ProducerRecord<String,String>("kafka-course","hello kafka");
+        ProducerRecord<String,String> record = new ProducerRecord<String,String>(topic,value,key);
 
         //Send data
         producer.send(record, new Callback() {
@@ -36,7 +41,7 @@ public class ProducerDemo {
                     logger.error( "Erro while producing", e);
                 }
             }
-        });
+        }).get();
 
         producer.flush();
 
